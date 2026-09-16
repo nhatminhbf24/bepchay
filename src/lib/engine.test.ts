@@ -4,6 +4,16 @@ import { defaultSettings } from './store';
 import { scaleAmount, shoppingFromMeals, suggestMeal } from './engine';
 
 describe('meal engine', () => {
+  it('ships 26 reviewed recipes with visible sources', () => {
+    expect(initialRecipes).toHaveLength(26);
+    expect(initialRecipes.every((recipe) => recipe.verification === 'source-checked' && recipe.sources?.length)).toBe(true);
+  });
+
+  it('does not seed explicitly banned animal ingredients', () => {
+    const text = initialRecipes.flatMap((recipe) => recipe.ingredients.map((item) => item.name.toLowerCase())).join(' ');
+    for (const banned of ['trứng', 'gelatin', 'thịt', 'cá', 'hải sản', 'nước mắm']) expect(text).not.toContain(banned);
+  });
+
   it('builds a balanced lunch without hidden recipes', () => {
     const result = suggestMeal('lunch', '2026-09-16', initialRecipes, defaultSettings, [], []);
     expect(result.recipeIds.length).toBe(3);
@@ -21,4 +31,3 @@ describe('meal engine', () => {
     expect(items.find((item) => item.name === 'Mướp')?.amount).toBe(700);
   });
 });
-

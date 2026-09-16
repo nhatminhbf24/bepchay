@@ -2,7 +2,7 @@ import { initialRecipes } from '../data/recipes';
 import type { AppState, MealSuggestion, Recipe, Settings, ShoppingItem } from '../types';
 
 const STORAGE_KEY = 'bep-chay-state-v1';
-const SEED_VERSION = 1;
+const SEED_VERSION = 2;
 
 export const defaultSettings: Settings = {
   enabledMeals: ['breakfast', 'lunch', 'dinner'],
@@ -18,9 +18,11 @@ export function loadState(): AppState {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return freshState();
     const parsed = JSON.parse(raw) as AppState;
-    const existingIds = new Set(parsed.recipes.map((recipe) => recipe.id));
+    const seeds = new Map(initialRecipes.map((recipe) => [recipe.id, recipe]));
+    const migrated = parsed.recipes.map((recipe) => parsed.seededVersion < SEED_VERSION && recipe.version === 1 && seeds.has(recipe.id) ? seeds.get(recipe.id)! : recipe);
+    const existingIds = new Set(migrated.map((recipe) => recipe.id));
     const newSeeds = initialRecipes.filter((recipe) => !existingIds.has(recipe.id));
-    return { ...parsed, recipes: [...parsed.recipes, ...newSeeds], seededVersion: SEED_VERSION };
+    return { ...parsed, recipes: [...migrated, ...newSeeds], seededVersion: SEED_VERSION };
   } catch {
     return freshState();
   }

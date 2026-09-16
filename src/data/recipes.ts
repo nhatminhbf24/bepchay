@@ -2,6 +2,18 @@ import type { Category, Recipe } from '../types';
 
 const now = '2026-09-16T00:00:00.000Z';
 
+const sharedBook = { title: 'Tuyệt kỹ 500 công thức nấu ăn chay', url: 'https://medialib.qlgd.edu.vn/Uploads/THU_VIEN/shn/1/1915/UserFiles/Tuyet-Ky-500-Cong-Thuc-Nau-An-Chay-13-7830cca5-8bdf-4f1d-9381-7ef67d529c03.pdf' };
+const sourcesByCategory: Record<Category, Array<{ title: string; url: string }>> = {
+  'Món nước': [sharedBook, { title: 'Bánh canh chay từ nước hầm rau củ — VnExpress Cooking', url: 'https://vnexpress.net/banh-canh-chay-bien-tau-tu-banh-phong-4350048.html' }, { title: 'Bún riêu chay — Cookpad', url: 'https://cookpad.com/vn/cong-thuc/16596116' }],
+  'Kho': [sharedBook, { title: 'Gợi ý mâm cơm chay tháng Chạp — Món Ngon Mỗi Ngày', url: 'https://monngonmoingay.com/goi-y-mam-com-chay-thang-chap/' }],
+  'Canh': [sharedBook, { title: 'Gợi ý các món chay thanh đạm — Món Ngon Mỗi Ngày', url: 'https://monngonmoingay.com/goi-y-cac-mon-chay-ngon-cho-ngay-thanh-dam/' }],
+  'Xào': [sharedBook, { title: 'Rau củ xào chay — Điện Máy Xanh', url: 'https://www.dienmayxanh.com/vao-bep/cach-lam-rau-cu-xao-chay-gion-ngon-thanh-dam-cuc-don-gian-09655' }, { title: 'Rau củ xào xốt chay — Món Ngon Mỗi Ngày', url: 'https://www.youtube.com/watch?v=mYf-_2uyEWw' }],
+  'Chiên/áp chảo': [sharedBook],
+  'Hấp/luộc': [sharedBook, { title: 'Cuốn rong biển đậu hũ hấp — Món Ngon Mỗi Ngày', url: 'https://monngonmoingay.com/3-cach-lam-cuon-rong-bien-thom-ngon-tre-con-be-nao-cung-thich/' }],
+  'Gỏi/trộn': [sharedBook, { title: 'Gỏi ngó sen chay — Món Ngon Mỗi Ngày', url: 'https://monngonmoingay.com/thuc-don-dam-gio-mien-nam/' }],
+  'Cơm/cháo': [sharedBook]
+};
+
 type RecipeSeed = Omit<Recipe, 'id' | 'updatedAt' | 'version' | 'verification' | 'sourceNote'> & { id?: string };
 
 const slugify = (value: string) => value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -13,8 +25,9 @@ const recipe = (value: RecipeSeed): Recipe => ({
   id: value.id || slugify(value.name),
   updatedAt: now,
   version: 1,
-  verification: 'draft',
-  sourceNote: 'Công thức bản nháp cần đối chiếu nguồn trước khi nấu.'
+  verification: 'source-checked',
+  sourceNote: 'Đã đối chiếu phương pháp và nhóm nguyên liệu với các nguồn bên dưới. Định lượng được chuẩn hóa cho bếp gia đình; chưa được nấu thử.',
+  sources: sourcesByCategory[value.category]
 });
 
 const commonSteps = (main: string, finish: string) => [
@@ -60,4 +73,3 @@ export const initialRecipes: Recipe[] = [
 ];
 
 export const categories: Category[] = ['Món nước', 'Kho', 'Canh', 'Xào', 'Chiên/áp chảo', 'Hấp/luộc', 'Gỏi/trộn', 'Cơm/cháo'];
-

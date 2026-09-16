@@ -30,6 +30,7 @@ export interface Recipe {
   favorite?: boolean;
   hidden?: boolean;
   sourceNote: string;
+  sources?: Array<{ title: string; url: string }>;
   verification: 'draft' | 'source-checked' | 'cooked';
   updatedAt: string;
   version: number;
@@ -70,4 +71,3 @@ export interface AppState {
   pantry: string[];
   seededVersion: number;
 }
-

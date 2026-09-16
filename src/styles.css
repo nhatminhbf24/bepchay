@@ -128,6 +128,9 @@ h2 { font-size: 1.32rem; margin-bottom: .6rem; }
 .steps p { margin: 4px 0; font-size: .84rem; line-height: 1.65; }
 .source-note { margin-top: 28px; padding: 16px; border-left: 4px solid var(--yellow); border-radius: 8px 14px 14px 8px; background: #fff8dc; font-size: .75rem; }
 .source-note p { margin: 5px 0 0; color: #6f6545; }
+.source-note ul { margin: 10px 0 0; padding-left: 18px; }
+.source-note li { margin-top: 5px; }
+.source-note a { color: var(--green); text-decoration: underline; text-underline-offset: 2px; }
 .week-list, .shopping-list { display: grid; gap: 12px; }
 .day-card, .settings-card { padding: 17px; border: 1px solid var(--line); border-radius: 18px; background: var(--paper); }
 .day-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }

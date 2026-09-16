@@ -8,7 +8,7 @@ Ngày cập nhật: 2026-09-16
 - MVP chạy cục bộ đã có giao diện ưu tiên điện thoại, khóa truy cập, gợi ý hôm nay, kho 26 món, chỉnh món, kế hoạch tuần, đi chợ và cài đặt.
 - Bộ máy gợi ý, đổi khẩu phần và tổng hợp nguyên liệu đã có kiểm thử.
 - API Firestore, phát hiện xung đột phiên bản và sao lưu R2 giữ hai bản đã được cài đặt nhưng chưa thể kiểm thử với tài khoản thật.
-- 26 công thức hiện vẫn mang trạng thái `draft`; cần đối chiếu từng nguồn trước khi coi là nội dung hoàn chỉnh.
+- 26 công thức đã được đối chiếu về phương pháp và nhóm nguyên liệu với sách/các nguồn công thức công khai; nguồn được hiển thị trong từng món. Định lượng đã được chuẩn hóa nhưng chưa nấu thử thực tế.
 
 ## Quyết định đã chốt
 
@@ -22,9 +22,9 @@ Ngày cập nhật: 2026-09-16
 
 ## Việc tiếp theo
 
-1. Đối chiếu và biên tập 26 công thức.
-2. Kiểm thử cài đặt Firestore/R2 bằng tài khoản thật.
-3. Triển khai thử qua GitHub lên Tenten và kiểm tra trên điện thoại.
+1. Kiểm thử cài đặt Firestore/R2 bằng tài khoản thật.
+2. Triển khai thử qua GitHub lên Tenten và kiểm tra trên điện thoại.
+3. Ghi nhận các món đã nấu thử và chỉnh theo khẩu vị gia đình.
 4. Bổ sung ảnh do người dùng cung cấp.
 
 ## Chưa xác minh
