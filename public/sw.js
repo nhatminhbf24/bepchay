@@ -1,4 +1,4 @@
-const CACHE_NAME = 'bep-chay-shell-v1';
+const CACHE_NAME = 'bep-chay-shell-v2';
 const APP_SHELL = ['/', '/manifest.webmanifest'];
 
 self.addEventListener('install', (event) => {
@@ -25,4 +25,3 @@ self.addEventListener('fetch', (event) => {
       .catch(() => caches.match(event.request).then((cached) => cached || caches.match('/')))
   );
 });
-

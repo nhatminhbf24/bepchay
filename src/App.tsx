@@ -17,33 +17,64 @@ const priorities: Array<{ id: Priority; label: string; icon: ReactNode }> = [
 
 const today = () => new Date().toLocaleDateString('en-CA');
 const prettyDate = (value: string) => new Intl.DateTimeFormat('vi-VN', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date(`${value}T12:00:00`));
+const LOCAL_AUTH_KEY = 'bep-chay-unlocked-v1';
+const STATIC_ACCESS_CODE = import.meta.env.VITE_ACCESS_CODE || '2410';
+
+type BackendMode = 'checking' | 'server' | 'static';
+
+async function jsonResponse(response: Response) {
+  const contentType = response.headers.get('content-type') || '';
+  if (!contentType.includes('application/json')) throw new Error('STATIC_HOSTING');
+  return response.json() as Promise<Record<string, any>>;
+}
 
 function App() {
   const [auth, setAuth] = useState<'loading' | 'yes' | 'no'>('loading');
+  const [backend, setBackend] = useState<BackendMode>('checking');
   useEffect(() => {
-    fetch('/api/auth/status').then((res) => res.json()).then((data) => setAuth(data.authenticated ? 'yes' : 'no')).catch(() => setAuth('no'));
+    let cancelled = false;
+    fetch('/api/auth/status', { headers: { Accept: 'application/json' } }).then(jsonResponse).then((data) => {
+      if (cancelled) return;
+      setBackend('server');
+      setAuth(data.authenticated ? 'yes' : 'no');
+    }).catch(() => {
+      if (cancelled) return;
+      setBackend('static');
+      setAuth(localStorage.getItem(LOCAL_AUTH_KEY) === 'yes' ? 'yes' : 'no');
+    });
+    return () => { cancelled = true; };
   }, []);
-  if (auth === 'loading') return <Splash />;
-  if (auth === 'no') return <Unlock onSuccess={() => setAuth('yes')} />;
-  return <Shell />;
+  if (auth === 'loading' || backend === 'checking') return <Splash />;
+  if (auth === 'no') return <Unlock backend={backend} onSuccess={() => setAuth('yes')} />;
+  return <Shell backend={backend} />;
 }
 
 function Splash() {
   return <main className="splash"><div className="brand-mark"><Leaf /></div><h1>Bếp Chay</h1><p>Mỗi ngày một bữa lành</p></main>;
 }
 
-function Unlock({ onSuccess }: { onSuccess: () => void }) {
+function Unlock({ backend, onSuccess }: { backend: Exclude<BackendMode, 'checking'>; onSuccess: () => void }) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   async function submit(event: FormEvent) {
     event.preventDefault(); setLoading(true); setError('');
     try {
-      const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Không thể mở bếp.');
+      if (backend === 'static') {
+        if (code !== STATIC_ACCESS_CODE) throw new Error('Mã vào bếp chưa đúng.');
+        localStorage.setItem(LOCAL_AUTH_KEY, 'yes');
+      } else {
+        const response = await fetch('/api/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ code }) });
+        const data = await jsonResponse(response);
+        if (!response.ok) throw new Error(data.message || 'Không thể mở bếp.');
+      }
       onSuccess();
-    } catch (err) { setError(err instanceof Error ? err.message : 'Có lỗi xảy ra.'); }
+    } catch (err) {
+      if (err instanceof Error && err.message === 'STATIC_HOSTING' && backend === 'server') {
+        if (code === STATIC_ACCESS_CODE) { localStorage.setItem(LOCAL_AUTH_KEY, 'yes'); onSuccess(); }
+        else setError('Mã vào bếp chưa đúng.');
+      } else setError(err instanceof Error ? err.message : 'Có lỗi xảy ra.');
+    }
     finally { setLoading(false); }
   }
   return <main className="unlock-page">
@@ -56,8 +87,8 @@ function Unlock({ onSuccess }: { onSuccess: () => void }) {
   </main>;
 }
 
-function Shell() {
-  const syncStatus = useSharedSync();
+function Shell({ backend }: { backend: Exclude<BackendMode, 'checking'> }) {
+  const syncStatus = useSharedSync(backend);
   return <div className="app-shell">
     <header className="topbar"><Link to="/" className="brand"><span className="brand-mark small"><Leaf /></span><span><b>Bếp Chay</b><small>{syncStatus === 'synced' ? 'Đã đồng bộ cho cả nhà' : syncStatus === 'saving' ? 'Đang lưu…' : syncStatus === 'offline' ? 'Đang dùng dữ liệu trên máy' : 'Mỗi ngày một bữa lành'}</small></span></Link><NavLink to="/settings" className="icon-button" aria-label="Cài đặt"><SettingsIcon /></NavLink></header>
     <main className="page"><Routes><Route path="/" element={<TodayPage />} /><Route path="/recipes" element={<RecipeLibrary />} /><Route path="/recipes/new" element={<RecipeEditor />} /><Route path="/recipes/:id" element={<RecipeDetail />} /><Route path="/recipes/:id/edit" element={<RecipeEditor />} /><Route path="/plan" element={<PlanPage />} /><Route path="/shopping" element={<ShoppingPage />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<Navigate to="/" replace />} /></Routes></main>
@@ -65,7 +96,7 @@ function Shell() {
   </div>;
 }
 
-function useSharedSync() {
+function useSharedSync(backend: Exclude<BackendMode, 'checking'>) {
   const { state, dispatch } = useApp();
   const [status, setStatus] = useState<'checking' | 'local' | 'saving' | 'synced' | 'offline'>('checking');
   const ready = useRef(false);
@@ -73,10 +104,14 @@ function useSharedSync() {
   const latestState = useRef(state);
   latestState.current = state;
   useEffect(() => {
+    if (backend === 'static') {
+      setStatus(navigator.onLine ? 'local' : 'offline');
+      return;
+    }
     let cancelled = false;
-    fetch('/api/state').then(async (response) => {
+    fetch('/api/state', { headers: { Accept: 'application/json' } }).then(async (response) => {
       if (!response.ok) throw new Error('sync unavailable');
-      const data = await response.json();
+      const data = await jsonResponse(response);
       if (cancelled) return;
       if (data.mode === 'local') { setStatus('local'); return; }
       if (data.state?.payload) {
@@ -85,23 +120,23 @@ function useSharedSync() {
         ready.current = true;
         setStatus('synced');
       } else {
-        const created = await fetch('/api/state', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payload: latestState.current }) });
+        const created = await fetch('/api/state', { method: 'PUT', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ payload: latestState.current }) });
         if (!created.ok) throw new Error('sync unavailable');
-        const result = await created.json();
+        const result = await jsonResponse(created);
         version.current = result.state.version;
         ready.current = true;
         setStatus('synced');
       }
     }).catch(() => { if (!cancelled) setStatus(navigator.onLine ? 'local' : 'offline'); });
     return () => { cancelled = true; };
-  }, [dispatch]);
+  }, [backend, dispatch]);
   useEffect(() => {
-    if (!ready.current) return;
+    if (backend === 'static' || !ready.current) return;
     setStatus('saving');
     const timer = window.setTimeout(async () => {
       try {
-        const response = await fetch('/api/state', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ payload: state, expectedVersion: version.current }) });
-        const result = await response.json();
+        const response = await fetch('/api/state', { method: 'PUT', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ payload: state, expectedVersion: version.current }) });
+        const result = await jsonResponse(response);
         if (response.status === 409 && result.state?.payload) {
           version.current = result.state.version;
           dispatch({ type: 'hydrate', value: result.state.payload });
@@ -114,7 +149,7 @@ function useSharedSync() {
       } catch { setStatus(navigator.onLine ? 'local' : 'offline'); }
     }, 700);
     return () => window.clearTimeout(timer);
-  }, [state, dispatch]);
+  }, [backend, state, dispatch]);
   return status;
 }
 
