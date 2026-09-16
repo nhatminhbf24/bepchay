@@ -2,7 +2,7 @@
 
 Webapp dùng chung trong gia đình để gợi ý món chay hằng ngày, quản lý công thức, lên kế hoạch tuần và tạo danh sách đi chợ.
 
-Trạng thái hiện tại: MVP chạy cục bộ đã sẵn sàng để kiểm thử; kết nối dịch vụ thật và nội dung công thức còn đang hoàn thiện. Xem [mô tả dự án](docs/PROJECT.md), [kế hoạch](docs/PLAN.md), [trạng thái](docs/STATUS.md) và [triển khai](docs/DEPLOYMENT.md).
+Trạng thái hiện tại: MVP đã được triển khai tại `https://daushop.pro.vn/`. Gói Tenten đang phục vụ React tĩnh nên dữ liệu chỉnh sửa được lưu trên từng thiết bị; khi cần đồng bộ chung, bật máy chủ Node và Firestore theo [hướng dẫn triển khai](docs/DEPLOYMENT.md). Xem [mô tả dự án](docs/PROJECT.md), [kế hoạch](docs/PLAN.md) và [trạng thái](docs/STATUS.md).
 
 ## Chạy thử
 
@@ -10,4 +10,4 @@ Trạng thái hiện tại: MVP chạy cục bộ đã sẵn sàng để kiểm 
 2. Chạy `pnpm install`.
 3. Chạy `pnpm run dev` rồi mở `http://localhost:5173`.
 
-Nếu chưa cấu hình Firebase, ứng dụng dùng dữ liệu cục bộ trên trình duyệt. Không đưa `.env` lên GitHub.
+Nếu hosting không chuyển tiếp được `/api`, ứng dụng tự chuyển sang dữ liệu cục bộ trên trình duyệt và vẫn mở bằng mã `2410`. Không đưa `.env` lên GitHub.

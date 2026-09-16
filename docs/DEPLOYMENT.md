@@ -1,6 +1,6 @@
 # Triển khai và vận hành
 
-Tài liệu này là danh sách triển khai dự kiến. Các tên nút cụ thể sẽ được bổ sung sau lần triển khai thử trên tài khoản thật.
+Bản React hiện đã được triển khai tại `https://daushop.pro.vn/` bằng Tenten 1-Click Launch với Node.js v24. Tenten đang phục vụ phần giao diện tĩnh; kiểm tra `/api/health` trả lỗi máy chủ, vì vậy ứng dụng tự chuyển sang localStorage để không chặn người dùng.
 
 Luồng dự kiến:
 
@@ -8,7 +8,7 @@ Luồng dự kiến:
 2. Tạo bucket Cloudflare R2 và khóa truy cập giới hạn đúng bucket.
 3. Đặt biến môi trường bí mật trên Tenten.
 4. Dán link GitHub, chọn tên miền và Node.js 24, rồi triển khai.
-5. Kiểm tra sức khỏe, đăng nhập bằng mã truy cập và nhập dữ liệu seed.
+5. Kiểm tra trang web, đăng nhập bằng mã truy cập và nhập dữ liệu seed.
 6. Bật cảnh báo chi phí và lịch sao lưu hàng tuần.
 
 Không đưa tệp `.env`, khóa dịch vụ, mật khẩu hoặc mã truy cập dạng rõ lên GitHub.
@@ -23,7 +23,7 @@ Không đưa tệp `.env`, khóa dịch vụ, mật khẩu hoặc mã truy cập
 - `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET`
 - `BACKUP_TOKEN`: chuỗi ngẫu nhiên riêng cho lịch sao lưu.
 
-Ứng dụng có endpoint `/api/health` để kiểm tra máy chủ. `DATA_PROVIDER=local` chỉ dành cho xem thử trên một thiết bị; dữ liệu gia đình dùng chung cần `firestore`.
+Ứng dụng có endpoint `/api/health` để kiểm tra máy chủ. Nếu endpoint không trả JSON, giao diện tự dùng localStorage và hiển thị trạng thái “Đang dùng dữ liệu trên máy”. Dữ liệu gia đình dùng chung cần một môi trường thực sự chạy `npm start`, có biến môi trường Firebase.
 
 ## Sao lưu hàng tuần
 
@@ -36,4 +36,4 @@ Thư mục `cloudflare-worker` chứa lịch mẫu chạy 10:00 sáng Chủ nh�
 - `pnpm run test`: kiểm tra logic.
 - `pnpm start`: chạy bản sản xuất trên cổng do hosting cung cấp.
 
-Tenten cần hỗ trợ biến môi trường cho các bí mật trên. Nếu giao diện triển khai không có mục này, cần yêu cầu hỗ trợ Tenten xác nhận trước khi kết nối dữ liệu thật.
+Tenten cần hỗ trợ biến môi trường và chuyển tiếp tiến trình Node cho các bí mật trên. Nếu giao diện triển khai không có mục này, bản localStorage vẫn dùng được; không nhập khóa Firebase vào mã nguồn.
