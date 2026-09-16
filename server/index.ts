@@ -7,7 +7,9 @@ import helmet from 'helmet';
 import { createBackup, readState, writeState } from './data.js';
 
 const app = express();
-const port = Number(process.env.PORT || 3000);
+// Tenten's Node launcher uses port 8666 when it does not inject PORT.
+// Keep PORT configurable for other hosts while matching that fallback here.
+const port = Number(process.env.PORT || 8666);
 const isProduction = process.env.NODE_ENV === 'production';
 const accessCode = process.env.ACCESS_CODE || (isProduction ? '' : '2410');
 const sessionSecret = process.env.SESSION_SECRET || crypto.randomBytes(32).toString('hex');
