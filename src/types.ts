@@ -63,11 +63,17 @@ export interface Settings {
   equipment: string[];
 }
 
+export interface RecipeProgress {
+  ingredients: string[];
+  steps: number[];
+}
+
 export interface AppState {
   recipes: Recipe[];
   meals: MealSuggestion[];
   shopping: ShoppingItem[];
   settings: Settings;
   pantry: string[];
+  progress: Record<string, RecipeProgress>;
   seededVersion: number;
 }

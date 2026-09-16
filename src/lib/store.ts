@@ -1,5 +1,5 @@
 import { initialRecipes } from '../data/recipes';
-import type { AppState, MealSuggestion, Recipe, Settings, ShoppingItem } from '../types';
+import type { AppState, MealSuggestion, Recipe, RecipeProgress, Settings, ShoppingItem } from '../types';
 
 const STORAGE_KEY = 'bep-chay-state-v1';
 const SEED_VERSION = 2;
@@ -22,14 +22,14 @@ export function loadState(): AppState {
     const migrated = parsed.recipes.map((recipe) => parsed.seededVersion < SEED_VERSION && recipe.version === 1 && seeds.has(recipe.id) ? seeds.get(recipe.id)! : recipe);
     const existingIds = new Set(migrated.map((recipe) => recipe.id));
     const newSeeds = initialRecipes.filter((recipe) => !existingIds.has(recipe.id));
-    return { ...parsed, recipes: [...migrated, ...newSeeds], seededVersion: SEED_VERSION };
+    return { ...parsed, recipes: [...migrated, ...newSeeds], progress: parsed.progress || {}, seededVersion: SEED_VERSION };
   } catch {
     return freshState();
   }
 }
 
 export function freshState(): AppState {
-  return { recipes: initialRecipes, meals: [], shopping: [], settings: defaultSettings, pantry: [], seededVersion: SEED_VERSION };
+  return { recipes: initialRecipes, meals: [], shopping: [], settings: defaultSettings, pantry: [], progress: {}, seededVersion: SEED_VERSION };
 }
 
 export function saveState(state: AppState) {
@@ -43,6 +43,7 @@ export type StateAction =
   | { type: 'meal-upsert'; value: MealSuggestion }
   | { type: 'recipe-upsert'; value: Recipe }
   | { type: 'recipe-toggle-favorite'; id: string }
+  | { type: 'recipe-progress'; recipeId: string; value: RecipeProgress }
   | { type: 'shopping-set'; value: ShoppingItem[] }
   | { type: 'shopping-toggle'; id: string };
 
@@ -54,6 +55,7 @@ export function reducer(state: AppState, action: StateAction): AppState {
     case 'meal-upsert': return { ...state, meals: [...state.meals.filter((item) => item.id !== action.value.id), action.value] };
     case 'recipe-upsert': return { ...state, recipes: [...state.recipes.filter((item) => item.id !== action.value.id), action.value] };
     case 'recipe-toggle-favorite': return { ...state, recipes: state.recipes.map((item) => item.id === action.id ? { ...item, favorite: !item.favorite, updatedAt: new Date().toISOString(), version: item.version + 1 } : item) };
+    case 'recipe-progress': return { ...state, progress: { ...state.progress, [action.recipeId]: action.value } };
     case 'shopping-set': return { ...state, shopping: action.value };
     case 'shopping-toggle': return { ...state, shopping: state.shopping.map((item) => item.id === action.id ? { ...item, checked: !item.checked } : item) };
   }
