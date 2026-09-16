@@ -1,0 +1,12 @@
+{
+  "name": "Bếp Chay",
+  "short_name": "Bếp Chay",
+  "description": "Gợi ý món chay mỗi ngày cho cả nhà",
+  "lang": "vi",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f7f3e8",
+  "theme_color": "#f7f3e8",
+  "icons": []
+}
+

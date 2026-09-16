@@ -1,0 +1,9 @@
+name = "bep-chay-weekly-backup"
+main = "src/index.js"
+compatibility_date = "2026-09-16"
+
+[triggers]
+crons = ["0 3 * * 0"]
+
+# Đặt APP_BACKUP_URL và BACKUP_TOKEN bằng Secrets trong Cloudflare.
+
