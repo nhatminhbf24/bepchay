@@ -1,6 +1,6 @@
 # Triển khai và vận hành
 
-Bản React hiện đã được triển khai tại `https://daushop.pro.vn/` bằng Tenten 1-Click Launch với Node.js v24. Tenten đang phục vụ phần giao diện tĩnh; kiểm tra `/api/health` trả lỗi máy chủ, vì vậy ứng dụng tự chuyển sang localStorage để không chặn người dùng.
+Bản React và API hiện đã được triển khai tại `https://daushop.pro.vn/` bằng Tenten 1-Click Launch với Node.js v24. File khởi động là `server-dist/index.js`; máy chủ dùng cổng dự phòng 8666 khi Tenten không truyền `PORT`. `/api/health` đã trả JSON HTTP 200. Firestore chưa bật nên ứng dụng vẫn dùng localStorage trên từng thiết bị.
 
 Luồng dự kiến:
 
@@ -34,6 +34,6 @@ Thư mục `cloudflare-worker` chứa lịch mẫu chạy 10:00 sáng Chủ nh�
 - `pnpm install`: cài thư viện và tạo bản build.
 - `pnpm run dev`: chạy giao diện và máy chủ khi phát triển.
 - `pnpm run test`: kiểm tra logic.
-- `pnpm start`: chạy bản sản xuất trên cổng do hosting cung cấp.
+- `pnpm start`: chạy bản sản xuất trên cổng do hosting cung cấp (hoặc 8666 trên Tenten khi không có `PORT`).
 
 Tenten cần hỗ trợ biến môi trường và chuyển tiếp tiến trình Node cho các bí mật trên. Nếu giao diện triển khai không có mục này, bản localStorage vẫn dùng được; không nhập khóa Firebase vào mã nguồn.
