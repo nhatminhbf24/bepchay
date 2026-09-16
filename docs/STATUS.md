@@ -7,7 +7,7 @@ Ngày cập nhật: 2026-09-16
 - Yêu cầu MVP đã được người dùng xác nhận và tài liệu nền tảng đã có commit đầu tiên `1290309`.
 - MVP đã có giao diện ưu tiên điện thoại, khóa truy cập, gợi ý hôm nay, kho 26 món, chỉnh món, kế hoạch tuần, đi chợ và cài đặt; bản sửa tương thích hosting React tĩnh đã triển khai tại `https://daushop.pro.vn/`.
 - Bộ máy gợi ý, đổi khẩu phần và tổng hợp nguyên liệu đã có kiểm thử.
-- API Firestore, phát hiện xung đột phiên bản và sao lưu R2 giữ hai bản đã được cài đặt cho môi trường Node. Tenten đã được cấu hình chạy `server-dist/index.js`, dùng cổng dự phòng 8666 và các biến R2; `/api/health` đã trả HTTP 200. Firestore chưa được bật nên dữ liệu hiện vẫn ở localStorage trên từng thiết bị.
+- API Firestore, phát hiện xung đột phiên bản và sao lưu R2 giữ hai bản đã được cài đặt cho môi trường Node. Tenten đã được cấu hình chạy `server-dist/index.js`, dùng cổng dự phòng 8666, các biến R2 và mã truy cập; `/api/health` và luồng đăng nhập đã trả thành công. Firestore chưa được bật nên dữ liệu hiện vẫn ở localStorage trên từng thiết bị.
 - 26 công thức đã được đối chiếu về phương pháp và nhóm nguyên liệu với sách/các nguồn công thức công khai; nguồn được hiển thị trong từng món. Định lượng đã được chuẩn hóa nhưng chưa nấu thử thực tế.
 
 ## Quyết định đã chốt
